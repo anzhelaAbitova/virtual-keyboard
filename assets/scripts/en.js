@@ -280,11 +280,18 @@ export default [
           small: 'Shift',
           shift: null,
           code: 'ShiftRight',
-        },
+        }
+      ],
+      [      
         {
           small: 'Ctrl',
           shift: null,
           code: 'ControlLeft',
+        },
+        {
+          small: 'Win',
+          shift: null,
+          code: 'Win',
         },
         {
           small: 'Alt',
@@ -300,13 +307,6 @@ export default [
           small: 'Alt',
           shift: null,
           code: 'AltRight',
-        }
-      ],
-      [
-        {
-          small: 'Ctrl',
-          shift: null,
-          code: 'ControlRight',
         },
         {
           small: `&larr;`,
@@ -329,9 +329,9 @@ export default [
           code: 'ArrowRight',
         },
         {
-          small: 'Win',
+          small: 'Ctrl',
           shift: null,
-          code: 'Win',
+          code: 'ControlRight',
         }
       ]
   ];

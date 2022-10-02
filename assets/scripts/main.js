@@ -66,7 +66,7 @@ function foo() {
 */
 //console.log(madeKey('A', 'a', 'keyA', 'false'));
 //console.log(foo())
-let lang = get('lang', '"ru"');
+let lang = [ en, ru ];
 
 class Key {
   constructor ({ code, small, shift }) {
@@ -78,43 +78,18 @@ class Key {
 
   madeKey = (subVal = null, smallVal, codeVal, fnVal) => {
     let wrapper = madeElem('div', 'keyboard__key', '', ['code', codeVal], ['fn', fnVal]);
-    let sub = '';
-    if (subVal !== null) {
-      sub = madeElem('div', 'sub', subVal);
-      wrapper.appendChild(sub);
-    }
-    let small = '';
-    if (smallVal.match(/arr/)) {
-      small = madeArrow('div', 'small', smallVal);
-    }
-    else {
-      small = madeElem('div', 'small', smallVal);
-    }
-    wrapper.appendChild(small);
-    return wrapper;
-  }
 
-  madeRow = () => {
-    
-  }
-}
+    let sub =  (subVal !== null) ? madeElem('div', 'sub', subVal) : '';
+    if (sub !== '') wrapper.appendChild(sub);
 
-class KeyDOM {
-  constructor() {
-    let $keys
-  }
+    let small = (smallVal.match(/arr/)) ? madeArrow('div', 'small', smallVal) : madeElem('div', 'small', smallVal);
 
-  madeKeyDOM() {
-    let wrapper = madeElem('div', 'keyboard__key', '', ['code', codeVal], ['fn', fnVal]);
-    let sub = madeElem('div', 'sub', subVal);
-    let small = madeElem('div', 'small', smallVal);
-    wrapper.appendChild(sub);
     wrapper.appendChild(small);
 
     return wrapper;
   }
-}
 
+}
 
 
 class Keyboard {
@@ -122,75 +97,82 @@ class Keyboard {
     this.rowsOrder = rowsOrder;
     this.keysPressed = {};
     this.isCaps = false;
-    this.lang = lang;
+    //this.lang = lang;
   }
 
   init = async () => {
     set('lang', 'ru');
-    let {$keys, keys} = await this.generateKeys();
+    console.log(lang[0])
 
-    let keyRow = madeElem('div', 'key-row');
+    let {$keys, keys} = await this.generateKeys(lang[0]);
 
-    //$keyboard.appendChild(keyRow)
-    //keyRow.append($keys)
-    console.log(keys)
+
     $keys.forEach(item => item.addEventListener('transitionend', removeTransition));
     window.addEventListener('keydown', playSound);
     window.addEventListener('keydown', function(e) {
-      if (document.querySelector(`[data-code="${e.code}"]`)) {
-        document.querySelector(`[data-code="${e.code}"]`).classList.add('keyboard__key-active');
-      }
+      keys.forEach((item)=> {
+        if (item.code === e.code){
+          item.dom.classList.add('keyboard__key-active');
+        }})
+        ;
     });
   }
 
-  generateKeys = async () => {
+  generateKeys = async (lang) => {
     let $keys = [];
     let keys = [];
-    en.forEach(item => {
-      console.log(item)
-      let oneKey = new Key(item);
-      keys.push(oneKey);
+    
+    lang.forEach(item => {
+      let rowWrap = madeElem('div', 'keyboard__row');
+      item.forEach(itemD=>{
+        let oneKey = new Key(itemD);
+        //console.log(oneKey)
+
+        oneKey.dom = oneKey.madeKey(itemD.shift, itemD.small, itemD.code, itemD.isFnKey);
+        rowWrap.appendChild(oneKey.dom);
+        keys.push(oneKey);
+        $keys.push(oneKey.dom);
+        //console.log($keys)
+      })
+      $keyboard.appendChild(rowWrap);
+
     });
-    keys.forEach(item => {
-      let oneKeyDom = item.madeKey(item.shift, item.small, item.code, item.isFnKey);
-      oneKeyDom.addEventListener('transitionend', oneKeyDom.removeTransition);
-      $keys.push(oneKeyDom);
-      oneKeyDom.addEventListener('click', playSound);
-      oneKeyDom.addEventListener('click', (e) => {
-        e.preventDefault();
-        oneKeyDom.classList.add('keyboard__key-active');
-        $textarea.focus();
-        this.isFnKeyCheck(item);
-        if (!item.isFnKey) {
-          if (this.isCaps) {
-            $textarea.value += item.shift.toUpperCase();
-          }
-          else {
-            $textarea.value += item.small.toLowerCase();
-          }
-        }
-        if (item.code === 'Win') {
-          if (get('lang') === 'ru') {
-            set('lang', 'en');
-          } 
-          else {
-            set('lang', 'ru');
-          }
-          console.log(get('lang'));
-        }
-      });
-      oneKeyDom.addEventListener('transitionend', removeTransition);
-      $keyboard.appendChild(oneKeyDom);
 
+    keys.forEach((item) => {
+      item.dom.addEventListener('transitionend', item.dom.removeTransition);
+      item.dom.addEventListener('click', playSound);
+
+      item.dom.addEventListener('click', (e) => {
+          e.preventDefault();
+          item.dom.classList.add('keyboard__key-active');
+          $textarea.focus();
+          this.isFnKeyCheck(item, item.dom);
+          if (!item.isFnKey) {
+            if (this.isCaps) {
+              $textarea.value += item.shift.toUpperCase();
+            }
+            else {
+              $textarea.value += item.small.toLowerCase();
+            }
+          }
+          if (item.code === 'Win') {
+            this.switchLang(item);
+            //console.log();
+          }
+        });
+        item.dom.addEventListener('transitionend', removeTransition);
     })
-    return {$keys, keys};
 
+ 
+    return {$keys, keys};
   }
 
-  isFnKeyCheck(item) {
+
+
+  isFnKeyCheck(item, itemDOM) {
     if (item.code === 'CapsLock') {
-      this.isCaps = true;
-      item.classList.add('keyboard__key--activatable');
+      this.isCaps = (this.isCaps) ? false : true;
+      itemDOM.classList.toggle('keyboard__key-Fn_active');
     }
     else if (item.code === 'Backspace') {
       $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);;
@@ -201,6 +183,20 @@ class Keyboard {
     }
     else if (item.code === 'Enter') {
       $textarea.value += `\n`;
+    }
+  }
+
+  switchLang(item){
+    $keyboard.innerHTML = '';
+    if (get('lang') === 'ru') {
+      set('lang', 'en');
+      this.generateKeys(lang[0]);
+      item.dom.children[0].innerText = 'en';
+    } 
+    else {
+      set('lang', 'ru');
+      this.generateKeys(lang[1]);
+      item.dom.children[0].innerText = 'ru';
     }
   }
 
