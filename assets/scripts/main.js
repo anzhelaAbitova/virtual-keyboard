@@ -59,51 +59,53 @@ const pickSound = (soundCheck) => {
 let lang = [en, ru];
 
 class Key {
-    constructor({ code, small, shift, cssClass }) {
-        this.code = code;
-        this.small = small;
-        this.shift = shift;
+    constructor({ code, small, shift, cssClass, isCaps, isShift }) {
+        this.codeVal = code;
+        this.smallVal = small;
+        this.subVal = shift;
         this.cssClass = cssClass;
+        this.isCaps = isCaps;
+        this.isShift = isShift;
         this.isFnKey = Boolean(small.match(/Ctrl|arr|Alt|Shift|Tab|Back|Del|Enter|Caps|Win/));
     }
 
-    madeKey = (subVal = null, smallVal, codeVal, fnVal, isCaps, isShift) => {
+    madeKey = () => {
         let wrapper = madeElem('div', 
-                        isShift && codeVal === 'ShiftLeft' || isCaps && codeVal === 'CapsLock' 
+                        this.isShift && this.codeVal === 'ShiftLeft' || this.isCaps && this.codeVal === 'CapsLock' 
                         ? ['keyboard__key', 'keyboard__key-Fn_active', this.cssClass]
                         : ['keyboard__key', this.cssClass],
-                    '', ['code', codeVal], ['fn', fnVal]);
+                    '', ['code', this.codeVal], ['fn', this.isFnKey]);
  
         let sub = '';
         let small = '';
-        if (codeVal.match(/Alt|Ctrl|Tab|Del/)) {
-            if (codeVal === 'AltLeft' || codeVal === 'AltRight') {
+        if (this.codeVal.match(/Alt|Ctrl|Tab|Del/)) {
+            if (this.codeVal === 'AltLeft' || this.codeVal === 'AltRight') {
                 let langNow = (get('lang'));
                 small = madeElem('div', 'small', langNow);
-            } else if (codeVal === 'Delete') {
+            } else if (this.codeVal === 'Delete') {
                 small = madeElem('div', 'small', '<span class="material-icons">close</span>');
-            } else if (codeVal === 'ControlLeft') {
+            } else if (this.codeVal === 'ControlLeft') {
                 small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSound ? 'volume_up' : 'volume_off'}</span>`);
-            } else if (codeVal === 'Tab') {
+            } else if (this.codeVal === 'Tab') {
                 small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSpeechRecord ? 'mic' : 'mic_off'}</span>`);
 
             }
         }
-        if (isShift && !fnVal) {
-            sub = madeElem('div', 'sub', smallVal);
-            small = (subVal !== null) ? madeElem('div', 'small', subVal) : '';
+        if (this.isShift && !this.isFnKey) {
+            sub = madeElem('div', 'sub', this.smallVal);
+            small = (this.subVal !== null) ? madeElem('div', 'small', this.subVal) : '';
             wrapper.appendChild(sub);
             if (small !== '') wrapper.appendChild(small);
 
         } else {
-            sub = (subVal !== null) ? madeElem('div', 'sub', subVal) : '';
+            sub = (this.subVal !== null) ? madeElem('div', 'sub', this.subVal) : '';
             if (sub !== '') wrapper.appendChild(sub);
 
-            small = (smallVal.match(/arr/)) ? madeArrow('div', 'small', smallVal) : madeElem('div', 'small', smallVal);
+            small = (this.smallVal.match(/arr/)) ? madeArrow('div', 'small', this.smallVal) : madeElem('div', 'small', this.smallVal);
             wrapper.appendChild(small);
-            if (isCaps && !isShift) {
+            if (this.isCaps && !this.isShift) {
                 small.innerText = small.innerText.toUpperCase();
-            } else if (isCaps && isShift) {
+            } else if (this.isCaps && this.isShift) {
                 small.innerText = small.innerText.toLowerCase();
             }
         }
@@ -156,8 +158,12 @@ class Keyboard {
             let rowWrap = madeElem('div', 'keyboard__row');
             item.forEach(itemD => {
                 let oneKey = new Key(itemD);
+                const obj = {
+                    isCaps: this.isCaps,
+                    isShift: this.isShift
+                }
 
-                oneKey.dom = oneKey.madeKey(oneKey.shift, oneKey.small, oneKey.code, oneKey.isFnKey, this.isCaps, this.isShift);
+                oneKey.dom = oneKey.madeKey({...oneKey, ...obj});
 
                 rowWrap.appendChild(oneKey.dom);
                 keys.push(oneKey);
