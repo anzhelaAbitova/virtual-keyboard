@@ -153,16 +153,17 @@ class Keyboard {
     generateKeys(lang) {
         let $keys = [];
         let keys = [];
+        const obj = {
+            isCaps: this.isCaps,
+            isShift: this.isShift
+        }
 
         lang.forEach(item => {
             let rowWrap = madeElem('div', 'keyboard__row');
             item.forEach(itemD => {
                 let oneKey = new Key(itemD);
-                const obj = {
-                    isCaps: this.isCaps,
-                    isShift: this.isShift
-                }
 
+                console.log({...oneKey, ...obj})
                 oneKey.dom = oneKey.madeKey({...oneKey, ...obj});
 
                 rowWrap.appendChild(oneKey.dom);
