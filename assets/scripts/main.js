@@ -80,14 +80,11 @@ class Key {
             if (codeVal === 'AltLeft' || codeVal === 'AltRight') {
                 let langNow = (get('lang'));
                 small = madeElem('div', 'small', langNow);
-            }
-            else if (codeVal === 'Delete') {
+            } else if (codeVal === 'Delete') {
                 small = madeElem('div', 'small', '<span class="material-icons">close</span>');
-            }
-            else if (codeVal === 'ControlLeft') {
+            } else if (codeVal === 'ControlLeft') {
                 small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSound ? 'volume_up' : 'volume_off'}</span>`);
-            }
-            else if (codeVal === 'Tab') {
+            } else if (codeVal === 'Tab') {
                 small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSpeechRecord ? 'mic' : 'mic_off'}</span>`);
 
             }
@@ -98,8 +95,7 @@ class Key {
             wrapper.appendChild(sub);
             if (small !== '') wrapper.appendChild(small);
 
-        }
-        else {
+        } else {
             sub = (subVal !== null) ? madeElem('div', 'sub', subVal) : '';
             if (sub !== '') wrapper.appendChild(sub);
 
@@ -107,8 +103,7 @@ class Key {
             wrapper.appendChild(small);
             if (isCaps && !isShift) {
                 small.innerText = small.innerText.toUpperCase();
-            }
-            else if (isCaps && isShift) {
+            } else if (isCaps && isShift) {
                 small.innerText = small.innerText.toLowerCase();
             }
         }
@@ -119,7 +114,7 @@ class Key {
 }
 
 class Keyboard {
-    constructor(rowsOrder) {
+    constructor() {
         this.isShift = false;
         this.keysPressed = {};
         this.isCaps = false;
@@ -153,7 +148,7 @@ class Keyboard {
         });
     }
 
-    generateKeys = async (lang, isCaps = false) => {
+    generateKeys = async (lang) => {
         let $keys = [];
         let keys = [];
 
@@ -185,33 +180,26 @@ class Keyboard {
                     if (!item.isFnKey) {
                         if (this.isCaps) {
                             $textarea.value += item.small.toUpperCase();
-                        }
-                        else if (this.isShift) {
+                        } else if (this.isShift) {
                             $textarea.value += item.shift;
-                        }
-                        else {
+                        } else {
                             $textarea.value += item.small.toLowerCase();
                         }
-                    }
-                    else if (item.code === 'Backspace') {
+                    } else if (item.code === 'Backspace') {
                         $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);
                     }
-                }
-                else if (selection < $textarea.value.length) {
+                } else if (selection < $textarea.value.length) {
                     let fHalfStr = $textarea.value.substring(0, selection);
                     let sHalfStr = $textarea.value.substring(0, $textarea.value.length - selection);
                     if (!item.isFnKey) {
                         if (this.isCaps) {
                             $textarea.value = fHalfStr + item.small.toUpperCase() + sHalfStr;
-                        }
-                        else if (this.isShift) {
+                        } else if (this.isShift) {
                             $textarea.value = fHalfStr + item.shift + sHalfStr;
-                        }
-                        else {
+                        } else {
                             $textarea.value = fHalfStr + item.small.toLowerCase() + sHalfStr;
                         }
-                    }
-                    else if (item.code === 'Backspace') {
+                    } else if (item.code === 'Backspace') {
                         selection = this.isFnKeyCheck(item, keys, lang);
 
                         $textarea.value = fHalfStr.substring(0, fHalfStr.length - 1) + sHalfStr;
@@ -233,30 +221,14 @@ class Keyboard {
 
     iconsForKeys(item) {
         if (item.code === 'ControlLeft') {
-            if (this.isSound) {
-                item.dom.innerHTML = '<span class="material-icons">volume_up</span>';
-            }
-            else {
-                item.dom.innerHTML = '<span class="material-icons">volume_off</span>';
-            }
-        }
-        else if (item.code === 'AltLeft' || item.code === 'AltRight') {
-            if (get('lang') === 'ru') {
-                item.dom.lastChild.innerHTML = 'ru';
-            }
-            else {
-                item.dom.lastChild.innerHTML = 'en';
-            }
-        }
-        else if (item.code === 'Tab') {
-            if (this.isSpeechRecord) {
-                item.dom.lastChild.innerHTML = '<span class="material-icons">mic</span>';
-            }
-            else {
-                item.dom.lastChild.innerHTML = '<span class="material-icons">mic_off</span>';
-            }
-        }
-        else if (item.code === 'Delete') {
+            item.dom.innerHTML = `<span class="material-icons">${this.isSound ? 'volume_up' : 'volume_off'}</span>`;
+        } else if (item.code === 'AltLeft' || item.code === 'AltRight') {
+            item.dom.lastChild.innerHTML =  get('lang') === 'ru' ? 'ru' : 'en';
+
+        } else if (item.code === 'Tab') {
+            item.dom.lastChild.innerHTML = `<span class="material-icons">${this.isSpeechRecord ? 'mic' :'mic_off'}</span>`;
+
+        } else if (item.code === 'Delete') {
             item.dom.lastChild.innerHTML = '<span class="material-icons">close</span>';
         }
     }
