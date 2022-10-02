@@ -1,5 +1,5 @@
-import en from './assets/en.js';
-import ru from './assets/ru.js';
+import en from '/en.js';
+import ru from '/ru.js';
 
 
 const $textarea = document.querySelector(".output");
