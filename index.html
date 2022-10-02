@@ -1,32 +1,31 @@
 <!DOCTYPE html>
+
 <head>
-  <title>virtual-keyboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="utf-8">
-  <link rel="shortcut icon" href="assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.8.55/css/materialdesignicons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+    <title>virtual-keyboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="assets/styles/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/styles/style.css">
 </head>
+
 <body>
-  <textarea class="output" rows="5" cols="50" placeholder="Start typing here..."></textarea>
-  <div class="keyboard keyboard--hidden"></div>
-  <p class="instruction">
-    Язык переключается <strong>AltRight</strong> и <strong>AltLeft</strong>, 
-    клавиша <strong>пробел</strong> между ними, звук выключается включается клавишей <strong>ControlLeft</strong>, 
-  <strong>Tab</strong> включает распознование речи, <strong>Delete</strong> закрывает клавиатуру.
-    <br> К сожалению, функционал стрелок вверх-вниз не реализован.
-    <br>Спасибо за проверку. <br>Удачного дня.
-  </p>
+    <textarea class="output" rows="5" cols="50" placeholder="Start typing here..."></textarea>
+    <div class="keyboard keyboard--hidden"></div>
+    <p class="instruction">
+        Язык переключается <strong>AltRight</strong> и <strong>AltLeft</strong>,
+        клавиша <strong>пробел</strong> между ними, звук выключается включается клавишей <strong>ControlLeft</strong>,
+        <strong>Tab</strong> включает распознование речи, <strong>Delete</strong> закрывает клавиатуру.
+    </p>
 
-  <audio class="key-audio" data-key-sound="com" src="assets/key-en-sound.mp3"></audio>
-  <audio class="key-audio" data-key-sound="com" src="assets/key-ru-sound.wav"></audio>
-  <audio class="key-audio" data-key-sound="back" src="assets/backspace-sound.wav"></audio>
-  <audio class="key-audio" data-key-sound="caps" src="assets/caps-sound.wav"></audio>
-  <audio class="key-audio" data-key-sound="enter" src="assets/enter-sound.wav"></audio>
-  <audio class="key-audio" data-key-sound="shift" src="assets/shift-sound.wav"></audio>
+    <audio class="key-audio" data-key-sound="com" src="assets/sounds/key-en-sound.mp3"></audio>
+    <audio class="key-audio" data-key-sound="com" src="assets/sounds/key-ru-sound.wav"></audio>
+    <audio class="key-audio" data-key-sound="back" src="assets/sounds/backspace-sound.wav"></audio>
+    <audio class="key-audio" data-key-sound="caps" src="assets/sounds/caps-sound.wav"></audio>
+    <audio class="key-audio" data-key-sound="enter" src="assets/sounds/enter-sound.wav"></audio>
+    <audio class="key-audio" data-key-sound="shift" src="assets/sounds/shift-sound.wav"></audio>
 
-  <script src="script.js" type="module"></script>
+    <script src="assets/scripts/main.js" type="module"></script>
 </body>
+
 </html>
