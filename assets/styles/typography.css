@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-weight: 300;
+    font-style: normal;
+    src: url(../fonts/material-symbols/material-symbols.ttf);
+}
+
+@font-face {
+    font-family: 'Fira Sans';
+    font-weight: 300;
+    font-style: normal;
+    src: url(..fonts/fira/FiraSans-Light.ttf);
+}
+
+@font-face {
+    font-family: 'Fira Sans';
+    font-weight: 400;
+    font-style: normal;
+    src: url(..fonts/fira/FiraSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: 'Fira Sans';
+    font-weight: 500;
+    font-style: normal;
+    src: url(..fonts/fira/FiraSans-Medium.ttf);
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+}
