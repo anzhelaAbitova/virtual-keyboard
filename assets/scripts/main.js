@@ -124,10 +124,10 @@ class Keyboard {
         this.isSpeechRecord = false;
     }
 
-    async init() {
+    init() {
         set('lang', 'en');
 
-        let { $keys, keys } = await this.generateKeys(lang[0]);
+        let { $keys, keys } = this.generateKeys(lang[0]);
 
         $textarea.addEventListener('focus', this.open);
         keys.forEach(item => {
@@ -150,7 +150,7 @@ class Keyboard {
         });
     }
 
-    async generateKeys(lang) {
+    generateKeys(lang) {
         let $keys = [];
         let keys = [];
 
