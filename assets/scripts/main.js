@@ -69,7 +69,7 @@ class Key {
         this.isFnKey = Boolean(small.match(/Ctrl|arr|Alt|Shift|Tab|Back|Del|Enter|Caps|Win/));
     }
 
-    madeKey = () => {
+    madeKey() {
         let wrapper = madeElem('div', 
                         this.isShift && this.codeVal === 'ShiftLeft' || this.isCaps && this.codeVal === 'CapsLock' 
                         ? ['keyboard__key', 'keyboard__key-Fn_active', this.cssClass]
@@ -124,7 +124,7 @@ class Keyboard {
         this.isSpeechRecord = false;
     }
 
-    init = async () => {
+    async init() {
         set('lang', 'en');
 
         let { $keys, keys } = await this.generateKeys(lang[0]);
@@ -150,7 +150,7 @@ class Keyboard {
         });
     }
 
-    generateKeys = async (lang) => {
+    async generateKeys() {
         let $keys = [];
         let keys = [];
 
