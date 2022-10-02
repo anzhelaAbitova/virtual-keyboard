@@ -10,15 +10,6 @@ const get = (name, subst = null) => JSON.parse(window.localStorage.getItem(name)
 const set =  (name, value) => window.localStorage.setItem(name, JSON.stringify(value));
 
 
-
-const rowsOrder = [
-  ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Delete'],
-  ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backspace'],
-  ['CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Backslash', 'Enter'],
-  ['ShiftLeft', 'IntlBackslash', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ArrowUp', 'ShiftRight'],
-  ['ControlLeft', 'Win', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'],
-];
-
 const madeArrow = (elem, className, inHTML) => {
   let el = document.createElement(elem);
   el.classList.add(className);
@@ -34,17 +25,24 @@ const madeElem = (elem, className, textNode = '', ...dataAttr) => {
   else {
     className.forEach(item=> el.classList.add(item));
   }
-  let text = document.createTextNode(textNode);
-  el.appendChild(text);
+  if (textNode.match(/^<span/)) {
+    //console.log(textNode)
+    el.innerHTML = textNode;
+  } 
+  else {
+    let text = document.createTextNode(textNode);
+    el.appendChild(text);
+  }
   if (dataAttr.length) {
     dataAttr.forEach(([attrName, attrValue]) => {
         el.dataset[attrName] = attrValue;
     })}
+    console.log(el.innerHTML);
+
   return el;
 }
 
 
-let sound = $keyAudio[0];
 const removeTransition = (e) => {
   //if (e.propertyName !== 'transform') return;
   e.target.classList.remove('keyboard__key-active');
@@ -80,6 +78,31 @@ class Key {
     }
     let sub = '';
     let small = '';
+    if (codeVal.match(/Alt|Ctrl|Tab|Del/)) {
+      if (codeVal === 'AltLeft' || codeVal === 'AltRight') {
+        let langNow = (get('lang'));
+        small = madeElem('div', 'small', langNow);
+      }
+      else if (codeVal === 'Delete') {
+        small = madeElem('div', 'small', '<span class="material-icons">close</span>');
+      } 
+      else if (codeVal === 'ControlLeft') {
+        if (keyboard.isSound) {
+          small = madeElem('div', 'small', '<span class="material-icons">volume_up</span>');
+        } 
+        else {
+          small = madeElem('div', 'small', '<span class="material-icons">volume_off</span>');
+        }
+      }
+      else if (codeVal === 'Tab') {
+        if (keyboard.isSpeechRecord) {
+          small = madeElem('div', 'small', '<span class="material-icons">mic</span>');
+        } 
+        else {
+          small = madeElem('div', 'small', '<span class="material-icons">mic_off</span>');
+        }
+      }
+    }
     if (isShift && !fnVal) {
       sub = madeElem('div', 'sub', smallVal);
       small =  (subVal !== null) ? madeElem('div', 'small', subVal) : '';
@@ -121,10 +144,9 @@ class Keyboard {
     let {$keys, keys} = await this.generateKeys(lang[0]);
 
     $textarea.addEventListener('focus', this.open);
-    $textarea.addEventListener('blur', this.close);
     keys.forEach(item => {
       item.dom.addEventListener('transitionend', removeTransition);
-      this.iconsForKeys(item);
+      //this.iconsForKeys(item);
     });
     window.addEventListener('keydown', function(e) {
       if (this.isCaps) {e.key.toUpperCase()};
@@ -136,12 +158,12 @@ class Keyboard {
         }})
         ;
     });
-    if (this.isCaps) {
+    /*if (this.isCaps) {
       $textarea.addEventListener('input', function(){
 
         $textarea.value = $textarea.value.toUpperCase();
       })
-    }
+    }*/
   }
 
   generateKeys = async (lang, isCaps = false) => {
@@ -161,17 +183,30 @@ class Keyboard {
 
       })
       $keyboard.appendChild(rowWrap);
+
     });
 
     keys.forEach((item) => {
+      keyboard.iconsForKeys(item);
       item.dom.addEventListener('transitionend', item.dom.removeTransition);
 
         item.dom.addEventListener('click', (e) => {
-          this.toggleSound(item, lang);
           e.preventDefault();
+          if (!item.isFnKey) {
+            if (this.isCaps) {
+              $textarea.value += item.small.toUpperCase();
+            }
+            else if(this.isShift) {
+              $textarea.value += item.shift;
+            }
+            else {
+              $textarea.value += item.small.toLowerCase();
+            }
+          }
+          this.toggleSound(item, lang);
           $textarea.focus();
           this.isFnKeyCheck(item, keys, lang);
-          this.iconsForKeys(item.dom);
+          this.iconsForKeys(item);
 
         });
 
@@ -185,10 +220,10 @@ class Keyboard {
   iconsForKeys(item) {
     if (item.code === 'ControlLeft') {
       if (this.isSound) {
-        item.dom.lastChild.innerHTML = '<span class="material-icons">volume_up</span>';
+        item.dom.innerHTML = '<span class="material-icons">volume_up</span>';
       } 
       else {
-        item.dom.lastChild.innerHTML = '<span class="material-icons">volume_off</span>';
+        item.dom.innerHTML = '<span class="material-icons">volume_off</span>';
       }
     }
     else if (item.code === 'AltLeft' || item.code === 'AltRight') {
@@ -200,41 +235,36 @@ class Keyboard {
       }
     }
     else if (item.code === 'Tab') {
-      if (this.isSound) {
+      if (this.isSpeechRecord) {
         item.dom.lastChild.innerHTML = '<span class="material-icons">mic</span>';
       } 
       else {
         item.dom.lastChild.innerHTML = '<span class="material-icons">mic_off</span>';
       }
     }
+    else if (item.code === 'Delete') {
+      item.dom.lastChild.innerHTML = '<span class="material-icons">close</span>';
+    }
   }
 
   isFnKeyCheck(item, arr, langNow = lang[0]) {
-    if (!item.isFnKey) {
-      if (this.isCaps) {
-        $textarea.value += item.small.toUpperCase();
-      }
-      else if(this.isShift) {
-        $textarea.value += item.shift;
-      }
-      else {
-        $textarea.value += item.small.toLowerCase();
-      }
-    }
+
     if (item.code === 'AltLeft' || item.code === 'AltRight') {
       this.switchLang(item);
       item.small = 'en';
     }
-    if (item.code === 'ControlLeft') {
+    else if (item.code === 'ControlLeft') {
       this.isSound = (this.isSound) ? false : true;
       this.iconsForKeys(item);
     }
-    if (item.code === 'CapsLock') {
+    else if (item.code === 'Delete') {
+      item.dom.addEventListener('click', keyboard.close);
+    }
+    else if (item.code === 'CapsLock') {
       this.isCaps = (this.isCaps) ? false : true;
       $keyboard.innerHTML = '';
 
       this.generateKeys(langNow, true);
-      item.dom.classList.toggle('keyboard__key-Fn_active');
     }
     else if (item.code === 'Backspace') {
       $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);;
@@ -244,7 +274,6 @@ class Keyboard {
       $keyboard.innerHTML = '';
 
       this.generateKeys(langNow, true);
-      item.dom.classList.toggle('keyboard__key-Fn_active');
     }
     else if (item.code === 'Enter') {
       $textarea.value += `\n`;
@@ -264,8 +293,6 @@ class Keyboard {
     if (get('lang') === 'ru') {
       set('lang', 'en');
       this.generateKeys(lang[0]);
-      console.log(item.dom.lastChild.innerHTML)
-      item.dom.lastChild.textContent  = 'en';
     } 
     else {
       set('lang', 'ru');
@@ -349,5 +376,7 @@ class Keyboard {
 
 }
 
-const keyboard = new Keyboard(rowsOrder);
+const keyboard = new Keyboard();
 console.log(keyboard.init());
+$textarea.addEventListener('focus', keyboard.open);
+$textarea.addEventListener('click', keyboard.open);

@@ -109,3 +109,14 @@
     border: 2px solid rgba(17, 242, 224, 0.6);
     box-shadow: 0px 0px 7px 0px rgba(255, 255, 255, 0.1);
   }
+  
+  @media screen and (max-width: 640px) {
+    .keyboard__key {
+      padding: 0;
+    }
+  }
+  
+  .instruction {
+    width: 90vw;
+    margin: 1rem auto;
+  }
