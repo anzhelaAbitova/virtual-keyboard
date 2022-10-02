@@ -9,25 +9,7 @@ const $keyAudio = document.querySelectorAll('.key-audio');
 const get = (name, subst = null) => JSON.parse(window.localStorage.getItem(name) || subst);
 const set =  (name, value) => window.localStorage.setItem(name, JSON.stringify(value));
 
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-const recognition = new SpeechRecognition;
-recognition.interimResults = true;
-
-recognition.addEventListener('result', (e) =>{
-  console.log(e.results);
-  const transcript = Array.from(e.results)
-    .map(result=> result[0])
-    .map(result => result.transcript)
-    .join('');
-
-    $textarea.value = transcript;
-    if (e.results[0].isFinal) {
-      $textarea.value += transcript;
-    }
-})
-
-recognition.start();
 
 const rowsOrder = [
   ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Delete'],
@@ -69,33 +51,15 @@ const removeTransition = (e) => {
 }
 
 const playSound = (e) => {
-  sound.currentTime = 0;
-  sound.play();
+  soundCheck.currentTime = 0;
+  soundCheck.play();
 }
 
-const pickSound = (item, soundCheck) => {
-  sound = soundCheck;
-  item.dom.addEventListener('click', playSound);
-  window.addEventListener('keydown', playSound);
-}
-/*
-const madeKey = (subVal, smallVal, codeVal, fnVal) => {
-  let wrapper = madeElem('div', 'keyboard__key', '', ['code', codeVal], ['fn', fnVal]);
-  let sub = madeElem('div', 'sub', subVal);
-  let small = madeElem('div', 'small', smallVal);
-  wrapper.appendChild(sub);
-  wrapper.appendChild(small);
-  return wrapper;
+const pickSound = (soundCheck) => {
+  soundCheck.currentTime = 0;
+  soundCheck.play();
 }
 
-function foo() {
-  var selObj = window.getSelection(); 
-  var selRange = selObj.getRangeAt();
-  // do stuff with the range
-}
-*/
-//console.log(madeKey('A', 'a', 'keyA', 'false'));
-//console.log(foo())
 let lang = [ en, ru ];
 
 class Key {
@@ -129,19 +93,13 @@ class Key {
 
       small = (smallVal.match(/arr/)) ? madeArrow('div', 'small', smallVal) : madeElem('div', 'small', smallVal);
       wrapper.appendChild(small);
-      if (isCaps) {
+      if (isCaps && !isShift) {
         small.innerText = small.innerText.toUpperCase();
       }
+      else if (isCaps && isShift) {
+        small.innerText = small.innerText.toLowerCase();
+      }
     }
-
-
-
-    /*
-    let sub =  (subVal !== null) ? madeElem('div', 'sub', subVal) : '';
-    if (sub !== '') wrapper.appendChild(sub);
-
-    let small = (smallVal.match(/arr/)) ? madeArrow('div', 'small', smallVal) : madeElem('div', 'small', smallVal);
-*/
 
     return wrapper;
   }
@@ -154,7 +112,7 @@ class Keyboard {
     this.keysPressed = {};
     this.isCaps = false;
     this.isSound = true;
-    //this.lang = lang;
+    this.isSpeechRecord = false;
   }
 
   init = async () => {
@@ -162,11 +120,10 @@ class Keyboard {
 
     let {$keys, keys} = await this.generateKeys(lang[0]);
 
-    //$textarea.addEventListener('focus', this.open);
-    //$textarea.addEventListener('blur', this.close);
+    $textarea.addEventListener('focus', this.open);
+    $textarea.addEventListener('blur', this.close);
     keys.forEach(item => {
       item.dom.addEventListener('transitionend', removeTransition);
-      this.toggleSound(item);
       this.iconsForKeys(item);
     });
     window.addEventListener('keydown', function(e) {
@@ -175,7 +132,7 @@ class Keyboard {
         if (item.code === e.code){
           item.dom.classList.add('keyboard__key-active');
           keyboard.isFnKeyCheck(item, keys);
-          
+          keyboard.toggleSound(item, get('lang'));
         }})
         ;
     });
@@ -190,12 +147,11 @@ class Keyboard {
   generateKeys = async (lang, isCaps = false) => {
     let $keys = [];
     let keys = [];
-    //console.log(this.isCaps)
+
     lang.forEach(item => {
       let rowWrap = madeElem('div', 'keyboard__row');
       item.forEach(itemD=>{
         let oneKey = new Key(itemD);
-        //console.log(oneKey)
 
         oneKey.dom = oneKey.madeKey(oneKey.shift, oneKey.small, oneKey.code, oneKey.isFnKey, this.isCaps, this.isShift);
 
@@ -203,21 +159,15 @@ class Keyboard {
         keys.push(oneKey);
         $keys.push(oneKey.dom);
 
-        //console.log($keys)
       })
       $keyboard.appendChild(rowWrap);
     });
 
     keys.forEach((item) => {
       item.dom.addEventListener('transitionend', item.dom.removeTransition);
-      /*if (this.isSound) {
-        item.dom.addEventListener('click', playSound);
-      }
-      else {
-        item.dom.removeEventListener('click', playSound);
-      }
-*/
+
         item.dom.addEventListener('click', (e) => {
+          this.toggleSound(item, lang);
           e.preventDefault();
           $textarea.focus();
           this.isFnKeyCheck(item, keys, lang);
@@ -299,6 +249,10 @@ class Keyboard {
     else if (item.code === 'Enter') {
       $textarea.value += `\n`;
     }
+    else if (item.code === 'Tab') {
+      this.isSpeechRecord = (this.isSpeechRecord) ? false : true;
+      this.recordSpeech();
+    }
     this.iconsForKeys(item.dom);
 
     item.dom.classList.add('keyboard__key-active');
@@ -321,18 +275,67 @@ class Keyboard {
 
   }
 
+  recordSpeech() {
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition;
+    if (this.isSpeechRecord) {
+
+      recognition.interimResults = true;
+      recognition.lang = (get('lang') === 'en') ? 'en-US' : 'ru-RU';
+      recognition.continuous = true;
+      
+      recognition.addEventListener('result', (e) =>{
+        const transcript = Array.from(e.results)
+          .map(result=> result[0])
+          .map(result => result.transcript)
+          .join('')
+      
+          
+          if (e.results[0].isFinal) {
+            $textarea.value += transcript;
+            console.log(transcript)
+          }
+      })
+      
+      recognition.start();
+    }
+    else {
+      recognition.stop();
+    }
+
+  }
+
   toggleSound(item) {
     if (this.isSound) {
-      //console.log($keyAudio[5])
 
-      if (item.code === 'Shift') {
-        pickSound(item, $keyAudio[5]);
+      if (item.code === 'ShiftLeft') {
+        pickSound($keyAudio[5]);
       }
+      else if (item.code === 'Backspace') {
+        pickSound($keyAudio[2]);
       }
-      else {
-        item.dom.removeEventListener('click', playSound);
-        window.removeEventListener('keydown', playSound);
+      else if (item.code === 'CapsLock') {
+        pickSound($keyAudio[3]);
       }
+      else if (item.code === 'Enter') {
+        pickSound($keyAudio[4]);
+      }
+      else { 
+        if (get('lang') === 'en') {
+          pickSound($keyAudio[0]); 
+        }
+        else if (get('lang') === 'ru'){
+          pickSound($keyAudio[1]); 
+        }
+      }
+
+
+    }
+    else {
+      item.dom.removeEventListener('click', playSound);
+      window.removeEventListener('keydown', playSound);
+    }
   }
 
   open() {
@@ -346,9 +349,5 @@ class Keyboard {
 
 }
 
-
 const keyboard = new Keyboard(rowsOrder);
 console.log(keyboard.init());
-
-
-
