@@ -9,21 +9,21 @@
     font-family: 'Fira Sans';
     font-weight: 300;
     font-style: normal;
-    src: url(..fonts/fira/FiraSans-Light.ttf);
+    src: url(../fonts/fira/FiraSans-Light.ttf);
 }
 
 @font-face {
     font-family: 'Fira Sans';
     font-weight: 400;
     font-style: normal;
-    src: url(..fonts/fira/FiraSans-Regular.ttf);
+    src: url(../fonts/fira/FiraSans-Regular.ttf);
 }
 
 @font-face {
     font-family: 'Fira Sans';
     font-weight: 500;
     font-style: normal;
-    src: url(..fonts/fira/FiraSans-Medium.ttf);
+    src: url(../fonts/fira/FiraSans-Medium.ttf);
 }
 
 .material-icons,
