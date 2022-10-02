@@ -43,7 +43,6 @@ const madeElem = (elem, className, textNode = '', ...dataAttr) => {
 
 
 const removeTransition = (e) => {
-
     e.target.classList.remove('keyboard__key-active');
 }
 
@@ -60,21 +59,21 @@ const pickSound = (soundCheck) => {
 let lang = [en, ru];
 
 class Key {
-    constructor({ code, small, shift }) {
+    constructor({ code, small, shift, cssClass }) {
         this.code = code;
         this.small = small;
         this.shift = shift;
+        this.cssClass = cssClass;
         this.isFnKey = Boolean(small.match(/Ctrl|arr|Alt|Shift|Tab|Back|Del|Enter|Caps|Win/));
     }
 
     madeKey = (subVal = null, smallVal, codeVal, fnVal, isCaps, isShift) => {
-        let wrapper = '';
-        if (isShift && codeVal === 'ShiftLeft' || isCaps && codeVal === 'CapsLock') {
-            wrapper = madeElem('div', ['keyboard__key', 'keyboard__key-Fn_active'], '', ['code', codeVal], ['fn', fnVal]);
-        }
-        else {
-            wrapper = madeElem('div', 'keyboard__key', '', ['code', codeVal], ['fn', fnVal]);
-        }
+        let wrapper = madeElem('div', 
+                        isShift && codeVal === 'ShiftLeft' || isCaps && codeVal === 'CapsLock' 
+                        ? ['keyboard__key', 'keyboard__key-Fn_active', this.cssClass]
+                        : ['keyboard__key', this.cssClass],
+                    '', ['code', codeVal], ['fn', fnVal]);
+ 
         let sub = '';
         let small = '';
         if (codeVal.match(/Alt|Ctrl|Tab|Del/)) {
@@ -86,20 +85,11 @@ class Key {
                 small = madeElem('div', 'small', '<span class="material-icons">close</span>');
             }
             else if (codeVal === 'ControlLeft') {
-                if (keyboard.isSound) {
-                    small = madeElem('div', 'small', '<span class="material-icons">volume_up</span>');
-                }
-                else {
-                    small = madeElem('div', 'small', '<span class="material-icons">volume_off</span>');
-                }
+                small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSound ? 'volume_up' : 'volume_off'}</span>`);
             }
             else if (codeVal === 'Tab') {
-                if (keyboard.isSpeechRecord) {
-                    small = madeElem('div', 'small', '<span class="material-icons">mic</span>');
-                }
-                else {
-                    small = madeElem('div', 'small', '<span class="material-icons">mic_off</span>');
-                }
+                small = madeElem('div', 'small', `<span class="material-icons">${keyboard.isSpeechRecord ? 'mic' : 'mic_off'}</span>`);
+
             }
         }
         if (isShift && !fnVal) {
@@ -190,7 +180,7 @@ class Keyboard {
             item.dom.addEventListener('click', (e) => {
                 e.preventDefault();
                 let selection = this.isFnKeyCheck(item, keys, lang);
-                console.log(selection);
+
                 if (selection === undefined) {
                     if (!item.isFnKey) {
                         if (this.isCaps) {
@@ -226,7 +216,6 @@ class Keyboard {
 
                         $textarea.value = fHalfStr.substring(0, fHalfStr.length - 1) + sHalfStr;
                     }
-                    console.log(fHalfStr)
                 }
 
                 this.toggleSound(item, lang);
@@ -350,7 +339,6 @@ class Keyboard {
 
                 if (e.results[0].isFinal) {
                     $textarea.value += transcript;
-                    console.log(transcript)
                 }
             })
 
@@ -418,6 +406,6 @@ class Keyboard {
 }
 
 const keyboard = new Keyboard();
-console.log(keyboard.init());
+keyboard.init();
 $textarea.addEventListener('focus', keyboard.open);
 $textarea.addEventListener('click', keyboard.open);
