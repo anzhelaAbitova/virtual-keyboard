@@ -183,23 +183,48 @@ class Keyboard {
 
         item.dom.addEventListener('click', (e) => {
           e.preventDefault();
-          if (!item.isFnKey) {
-            if (this.isCaps) {
-              $textarea.value += item.small.toUpperCase();
+          let selection = this.isFnKeyCheck(item, keys, lang);
+          console.log(selection);
+          if (selection === undefined) {
+            if (!item.isFnKey) {
+              if (this.isCaps) {
+                $textarea.value += item.small.toUpperCase();
+              }
+              else if(this.isShift) {
+                $textarea.value += item.shift;
+              }
+              else {
+                $textarea.value += item.small.toLowerCase();
+              }
             }
-            else if(this.isShift) {
-              $textarea.value += item.shift;
-            }
-            else {
-              $textarea.value += item.small.toLowerCase();
+            else if (item.code === 'Backspace') {
+              $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);
             }
           }
-          else if (item.code === 'Backspace') {
-            $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);
+          else if (selection < $textarea.value.length) {
+            let fHalfStr = $textarea.value.substring(0, selection);
+            let sHalfStr = $textarea.value.substring(0, $textarea.value.length - selection);
+            if (!item.isFnKey) {
+              if (this.isCaps) {
+                $textarea.value = fHalfStr + item.small.toUpperCase() + sHalfStr;
+              }
+              else if(this.isShift) {
+                $textarea.value = fHalfStr + item.shift + sHalfStr;
+              }
+              else {
+                $textarea.value = fHalfStr + item.small.toLowerCase() + sHalfStr;
+              }
+            }
+            else if (item.code === 'Backspace') {
+              selection = this.isFnKeyCheck(item, keys, lang);
+
+              $textarea.value = fHalfStr.substring(0, fHalfStr.length - 1) + sHalfStr;
+            }
+            console.log(fHalfStr)
           }
+
           this.toggleSound(item, lang);
           $textarea.focus();
-          this.isFnKeyCheck(item, keys, lang);
           this.iconsForKeys(item);
 
         });
@@ -242,6 +267,7 @@ class Keyboard {
   }
 
   isFnKeyCheck(item, arr, langNow = lang[0]) {
+    item.dom.classList.add('keyboard__key-active');
 
     if (item.code === 'AltLeft' || item.code === 'AltRight') {
       this.switchLang(item);
@@ -274,14 +300,14 @@ class Keyboard {
       this.recordSpeech();
     }
     else if (item.code === 'ArrowLeft') {
-      this.arrowToLeft();
+      let selLeft = this.arrowToLeft();
+      return selLeft;
     }
     else if (item.code === 'ArrowRight') {
-      this.arrowToRight();
+      let selRight = this.arrowToRight();
+      return selRight;
     }
     this.iconsForKeys(item.dom);
-
-    item.dom.classList.add('keyboard__key-active');
 
   }
 
@@ -365,11 +391,13 @@ class Keyboard {
   arrowToLeft() {
     $textarea.selectionStart = Math.max(0, $textarea.selectionStart - 1);
     $textarea.selectionEnd = $textarea.selectionStart;
+    return $textarea.selectionStart;
   }
 
   arrowToRight() {
     $textarea.selectionStart = Math.min($textarea.value.length, $textarea.selectionEnd + 1);
     $textarea.selectionEnd = $textarea.selectionStart;
+    return $textarea.selectionStart;
   }
 
   open() {
