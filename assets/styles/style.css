@@ -37,12 +37,15 @@ body {
     left: 0;
     bottom: 0;
     width: 100vw;
-    padding: 5px 0;
+    padding: 5px 5vw;
     background: #004134;
     background-image: linear-gradient(35deg, #053561, #175887, #267dae, #35a5d7);
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     user-select: none;
     transition: all 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
 }
 
 .keyboard--hidden {
@@ -59,14 +62,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px 0;
+    column-gap: 4px;
 }
 
 .keyboard__key {
     font-family: 'Fira Sans', sans-serif;
     height: 45px;
-    width: fit-content;
-    max-width: 90px;
+    width: 100%;
     margin: 3px;
     border-radius: 4px;
     border: none;
@@ -99,8 +101,8 @@ body {
 
 .keyboard__key .sub {
     position: absolute;
-    left: 3px;
-    top: 1px;
+    left: 0.5rem;
+    top: 0.3rem;
     font-size: clamp(11px, 0.5rem, 15px);
 }
 
@@ -113,6 +115,14 @@ body {
     background-image: linear-gradient(45deg, rgba(43, 29, 183, 0.4), rgba(75, 104, 198, 0.4), rgba(77, 172, 212, 0.4), rgba(17, 242, 224, 0.4));
     border: 2px solid rgba(17, 242, 224, 0.6);
     box-shadow: 0px 0px 7px 0px rgba(255, 255, 255, 0.1);
+}
+
+.ordin-keys {
+    max-width: 80px;
+}
+
+.controls {
+
 }
 
 @media screen and (max-width: 640px) {
