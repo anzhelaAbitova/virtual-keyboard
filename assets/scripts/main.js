@@ -145,6 +145,10 @@ class Keyboard {
     keys.forEach(item => {
       item.dom.addEventListener('transitionend', removeTransition);
     });
+    this.phiKeyboard(keys);
+  }
+
+  phiKeyboard(keys) {
     window.addEventListener('keydown', function(e) {
       if (this.isCaps) {e.key.toUpperCase()};
       keys.forEach((item)=> {
@@ -226,7 +230,7 @@ class Keyboard {
           this.toggleSound(item, lang);
           $textarea.focus();
           this.iconsForKeys(item);
-
+          this.phiKeyboard(keys);
         });
 
       item.dom.addEventListener('transitionend', removeTransition);
