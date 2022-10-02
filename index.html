@@ -5,13 +5,21 @@
   <meta charset="utf-8">
   <link rel="shortcut icon" href="assets/favicon.ico">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.8.55/css/materialdesignicons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <textarea class="output" rows="5" cols="50" placeholder="Start typing something..." autofocus></textarea>
+  <textarea class="output" rows="5" cols="50" placeholder="Start typing something..."></textarea>
   <div class="keyboard"></div>
-  <audio class="key-audio" src="assets/sound_3.mp3"></audio>
+
+  <audio class="key-audio" data-key-sound="com" src="assets/key-en-sound.mp3"></audio>
+  <audio class="key-audio" data-key-sound="com" src="assets/key-ru-sound.wav"></audio>
+  <audio class="key-audio" data-key-sound="back" src="assets/backspace-sound.wav"></audio>
+  <audio class="key-audio" data-key-sound="caps" src="assets/caps-sound.wav"></audio>
+  <audio class="key-audio" data-key-sound="enter" src="assets/enter-sound.wav"></audio>
+  <audio class="key-audio" data-key-sound="shift" src="assets/shift-sound.wav"></audio>
+
   <script src="script.js" type="module"></script>
 </body>
 </html>

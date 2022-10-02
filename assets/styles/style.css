@@ -42,11 +42,12 @@
     background-image: linear-gradient(35deg, #053561, #175887, #267dae, #35a5d7);
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     user-select: none;
-    transition: bottom 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
   }
   
   .keyboard--hidden {
-    bottom: -100%;
+    transform: translateY(100%);
+    box-shadow: none;
   }
   
   .keyboard__keys {

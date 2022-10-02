@@ -289,11 +289,6 @@ export default [
         code: 'ControlLeft',
       },
       {
-        small: 'Win',
-        shift: null,
-        code: 'Win',
-      },
-      {
         small: 'Alt',
         shift: null,
         code: 'AltLeft',
@@ -327,11 +322,6 @@ export default [
         small: '&rarr;',
         shift: null,
         code: 'ArrowRight',
-      },
-      {
-        small: 'Ctrl',
-        shift: null,
-        code: 'ControlRight',
       }
     ]
   ];
