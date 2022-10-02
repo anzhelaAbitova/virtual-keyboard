@@ -26,7 +26,6 @@ const madeElem = (elem, className, textNode = '', ...dataAttr) => {
     className.forEach(item=> el.classList.add(item));
   }
   if (textNode.match(/^<span/)) {
-    //console.log(textNode)
     el.innerHTML = textNode;
   } 
   else {
@@ -37,14 +36,13 @@ const madeElem = (elem, className, textNode = '', ...dataAttr) => {
     dataAttr.forEach(([attrName, attrValue]) => {
         el.dataset[attrName] = attrValue;
     })}
-    console.log(el.innerHTML);
 
   return el;
 }
 
 
 const removeTransition = (e) => {
-  //if (e.propertyName !== 'transform') return;
+
   e.target.classList.remove('keyboard__key-active');
 }
 
@@ -146,7 +144,6 @@ class Keyboard {
     $textarea.addEventListener('focus', this.open);
     keys.forEach(item => {
       item.dom.addEventListener('transitionend', removeTransition);
-      //this.iconsForKeys(item);
     });
     window.addEventListener('keydown', function(e) {
       if (this.isCaps) {e.key.toUpperCase()};
@@ -158,12 +155,6 @@ class Keyboard {
         }})
         ;
     });
-    /*if (this.isCaps) {
-      $textarea.addEventListener('input', function(){
-
-        $textarea.value = $textarea.value.toUpperCase();
-      })
-    }*/
   }
 
   generateKeys = async (lang, isCaps = false) => {
@@ -202,6 +193,9 @@ class Keyboard {
             else {
               $textarea.value += item.small.toLowerCase();
             }
+          }
+          else if (item.code === 'Backspace') {
+            $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);
           }
           this.toggleSound(item, lang);
           $textarea.focus();
@@ -266,9 +260,6 @@ class Keyboard {
 
       this.generateKeys(langNow, true);
     }
-    else if (item.code === 'Backspace') {
-      $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);;
-    }
     else if (item.code === 'ShiftLeft' || item.code === 'ShiftRight') {
       this.isShift = (this.isShift) ? false : true;
       $keyboard.innerHTML = '';
@@ -281,6 +272,12 @@ class Keyboard {
     else if (item.code === 'Tab') {
       this.isSpeechRecord = (this.isSpeechRecord) ? false : true;
       this.recordSpeech();
+    }
+    else if (item.code === 'ArrowLeft') {
+      this.arrowToLeft();
+    }
+    else if (item.code === 'ArrowRight') {
+      this.arrowToRight();
     }
     this.iconsForKeys(item.dom);
 
@@ -363,6 +360,16 @@ class Keyboard {
       item.dom.removeEventListener('click', playSound);
       window.removeEventListener('keydown', playSound);
     }
+  }
+
+  arrowToLeft() {
+    $textarea.selectionStart = Math.max(0, $textarea.selectionStart - 1);
+    $textarea.selectionEnd = $textarea.selectionStart;
+  }
+
+  arrowToRight() {
+    $textarea.selectionStart = Math.min($textarea.value.length, $textarea.selectionEnd + 1);
+    $textarea.selectionEnd = $textarea.selectionStart;
   }
 
   open() {
