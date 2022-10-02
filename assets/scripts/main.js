@@ -150,7 +150,7 @@ class Keyboard {
         });
     }
 
-    async generateKeys() {
+    async generateKeys(lang) {
         let $keys = [];
         let keys = [];
 
