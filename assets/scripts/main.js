@@ -78,7 +78,22 @@ class Key {
  
         let sub = '';
         let small = '';
-        if (this.codeVal.match(/Alt|Ctrl|Tab|Del/)) {
+
+        if (this.isShift && !this.isFnKey) {
+            sub = madeElem('div', 'sub', this.smallVal);
+            small = (this.subVal !== null) ? madeElem('div', 'small', this.subVal) : '';
+
+        } else {
+            sub = (this.subVal !== null) ? madeElem('div', 'sub', this.subVal) : '';
+            small = (this.smallVal.match(/arr/)) ? madeArrow('div', 'small', this.smallVal) : madeElem('div', 'small', this.smallVal);
+            if (this.isCaps && !this.isShift) {
+                small.innerText = small.innerText.toUpperCase();
+            } else if (this.isCaps && this.isShift) {
+                small.innerText = small.innerText.toLowerCase();
+            }
+        }
+
+        if (this.codeVal.match(/Alt|Control|Tab|Del/)) {
             if (this.codeVal === 'AltLeft' || this.codeVal === 'AltRight') {
                 let langNow = (get('lang'));
                 small = madeElem('div', 'small', langNow);
@@ -91,25 +106,9 @@ class Key {
 
             }
         }
-        if (this.isShift && !this.isFnKey) {
-            sub = madeElem('div', 'sub', this.smallVal);
-            small = (this.subVal !== null) ? madeElem('div', 'small', this.subVal) : '';
-            wrapper.appendChild(sub);
-            if (small !== '') wrapper.appendChild(small);
 
-        } else {
-            sub = (this.subVal !== null) ? madeElem('div', 'sub', this.subVal) : '';
-            if (sub !== '') wrapper.appendChild(sub);
-
-            small = (this.smallVal.match(/arr/)) ? madeArrow('div', 'small', this.smallVal) : madeElem('div', 'small', this.smallVal);
-            wrapper.appendChild(small);
-            if (this.isCaps && !this.isShift) {
-                small.innerText = small.innerText.toUpperCase();
-            } else if (this.isCaps && this.isShift) {
-                small.innerText = small.innerText.toLowerCase();
-            }
-        }
-
+        if (sub) wrapper.appendChild(sub);
+        if (small) wrapper.appendChild(small);
         return wrapper;
     }
 
@@ -161,9 +160,8 @@ class Keyboard {
         lang.forEach(item => {
             let rowWrap = madeElem('div', 'keyboard__row');
             item.forEach(itemD => {
-                let oneKey = new Key(itemD);
+                let oneKey = new Key({...itemD, ...obj});
 
-                console.log({...oneKey, ...obj})
                 oneKey.dom = oneKey.madeKey({...oneKey, ...obj});
 
                 rowWrap.appendChild(oneKey.dom);
@@ -171,8 +169,8 @@ class Keyboard {
                 $keys.push(oneKey.dom);
 
             })
-            $keyboard.appendChild(rowWrap);
 
+            $keyboard.appendChild(rowWrap);
         });
 
         keys.forEach((item) => {
@@ -190,7 +188,7 @@ class Keyboard {
                         } else if (this.isShift) {
                             $textarea.value += item.shift;
                         } else {
-                            $textarea.value += item.small.toLowerCase();
+                            $textarea.value += item.smallVal.toLowerCase();
                         }
                     } else if (item.code === 'Backspace') {
                         $textarea.value = $textarea.value.substring(0, $textarea.value.length - 1);
@@ -221,7 +219,6 @@ class Keyboard {
 
             item.dom.addEventListener('transitionend', removeTransition);
         })
-
 
         return { $keys, keys };
     }
