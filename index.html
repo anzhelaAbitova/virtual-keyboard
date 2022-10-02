@@ -3,11 +3,15 @@
   <title>virtual-keyboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
-  <link rel="shortcut icon" href="assets/images/favicon.ico">
-  <link rel="stylesheet" href="assets/styles/style.css">
+  <link rel="shortcut icon" href="assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <textarea class="use-keyboard-input" placeholder="Click here"></textarea>
-  <script src="assets/scripts/main.js"></script>
+  <textarea class="output" rows="5" cols="50" placeholder="Start typing something..." autofocus></textarea>
+  <div class="keyboard"></div>
+  <audio class="key-audio" src="assets/sound_3.mp3"></audio>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
